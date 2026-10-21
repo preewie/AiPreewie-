@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ហាងលក់រឿង - Mini App</title>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #0088cc;
+            --text-color: #ffffff;
+            --text-sub: #94a3b8;
+            --btn-buy: #2563eb;
+            --btn-cancel: #ef4444;
+        }
+
+        body {
+            font-family: 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 12px;
+        }
+
+        /* Header Layout */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 15px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+        .credit-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        /* Product Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+        }
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .price {
+            color: #38bdf8;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .btn-buy {
+            background-color: var(--btn-buy);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        /* Payment Modal Popup */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #475569;
+        }
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: #fff;
+            margin: 15px auto;
+            padding: 10px;
+            border-radius: 12px;
+        }
+        .qr-code img { width: 100%; height: 100%; }
+        .upload-section {
+            margin-top: 15px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .upload-section input {
+            width: 100%;
+            margin-top: 5px;
+            color: var(--text-sub);
+        }
+        .btn-submit {
+            background: #9333ea;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+        .btn-close {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 8px;
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <div class="header">
+        <div class="user-info">
+            <span>ហាងលក់រឿង</span>
+        </div>
+        <div class="credit-badge">💎 80 Credits</div>
+    </div>
+
+    <!-- Product List -->
+    <div class="grid">
+        <!-- Item 1 -->
+        <div class="card">
+            <img src="https://via.placeholder.com/200x300" alt="Cover">
+            <div class="card-content">
+                <div class="title">អំណាចកូនស្រីច្បង (ដាច់ចប់)</div>
+                <div class="price">$2.00</div>
+                <button class="btn-buy" onclick="openPayment('អំណាចកូនស្រីច្បង', '$2.00')">🛒 ទិញឥឡូវនេះ</button>
+            </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="card">
+            <img src="https://via.placeholder.com/200x300" alt="Cover">
+            <div class="card-content">
+                <div class="title">បន្ថយខ្លួន ដើម្បីចាប់អ្នកបម្រើ (ដាច់ចប់)</div>
+                <div class="price">$2.00</div>
+                <button class="btn-buy" onclick="openPayment('បន្ថយខ្លួន ដើម្បីចាប់អ្នកបម្រើ', '$2.00')">🛒 ទិញឥឡូវនេះ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Popup Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <h3 style="margin:0;" id="modalTitle">ទូទាត់ប្រាក់</h3>
+            <p style="color: var(--text-sub); margin: 5px 0;" id="modalPrice">$2.00</p>
+            
+            <p style="font-size: 13px; color: #f59e0b;">💵 សូមបង់លុយតាម QR ខាងក្រោម</p>
+            
+            <div class="qr-code">
+                <!-- ដាក់ Link រូប QR KHQR របស់អ្នកនៅទីនេះ -->
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=KHQR_DEMO" alt="KHQR">
+            </div>
+
+            <div class="upload-section">
+                <label>✅ បន្ទាប់ពីបង់រួច សូម Upload រូបស្និបបង់ប្រាក់៖</label>
+                <input type="file" id="receiptInput" accept="image/*">
+            </div>
+
+            <button class="btn-submit" onclick="submitReceipt()">📄 ផ្ញើស្វីបទៅ Admin</button>
+            <button class="btn-close" onclick="closePayment()">❌ បោះបង់</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let selectedProduct = "";
+
+        function openPayment(title, price) {
+            selectedProduct = title;
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalPrice').innerText = price;
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePayment() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        function submitReceipt() {
+            const fileInput = document.getElementById('receiptInput');
+            if (fileInput.files.length === 0) {
+                alert('សូមជ្រើសរើសរូបភាពវិក្កយបត្រជាមុនសិន!');
+                return;
+            }
+
+            // ផ្ញើសារ/ទិន្នន័យត្រឡប់ទៅកាន់ Telegram Bot
+            tg.sendData(JSON.stringify({
+                product: selectedProduct,
+                price: "$2.00",
+                status: "paid_pending_approval"
+            }));
+
+            alert('បានផ្ញើវិក្កយបត្រជោគជ័យ! សូមរង់ចាំ Admin ពិនិត្យ។');
+            closePayment();
+        }
+    </script>
+</body>
+</html>
