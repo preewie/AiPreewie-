@@ -91,7 +91,73 @@ app.get("/db-check", async (req, res) => {
     message: "Supabase database connected"
   });
 });
+// Admin file upload
+app.post(
+  "/api/admin/upload",
+  requireAdmin,
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          status: "error",
+          message: "No file uploaded"
+        });
+      }
 
+      const bucket = req.body.bucket;
+
+      if (!["story-covers", "story-videos"].includes(bucket)) {
+        return res.status(400).json({
+          status: "error",
+          message: "Invalid bucket"
+        });
+      }
+
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "video/mp4"
+      ];
+
+      if (!allowedTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({
+          status: "error",
+          message: "Unsupported file type"
+        });
+      }
+
+      const fileExt = req.file.originalname.split(".").pop();
+      const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          upsert: false
+        });
+
+      if (error) {
+        return res.status(500).json({
+          status: "error",
+          message: "Upload failed"
+        });
+      }
+
+      res.json({
+        status: "success",
+        bucket,
+        path: data.path
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Server upload error"
+      });
+    }
+  }
+);
 // Public stories
 app.get("/api/stories", async (req, res) => {
   const { data, error } = await supabase
