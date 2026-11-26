@@ -322,7 +322,25 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
 <div id="updates" class="hide"><section><h2>✨ Updates</h2><div class="panel">Updates will appear here.</div></section></div>
 </main>
 <nav class="bottom">
-<button class="active" onclick="showPage('home',this)">🏠 Home</button><button onclick="showPage('library',this)">📚 Library</button><button onclick="showPage('profile',this)">👤 Profile</button><button onclick="showPage('updates',this)">✨ Updates</button>
+  <button class="active" onclick="showPage('home',this)">
+    <span class="nav-icon">🏠</span>
+    <span>Home</span>
+  </button>
+
+  <button onclick="showPage('library',this)">
+    <span class="nav-icon">📚</span>
+    <span>Library</span>
+  </button>
+
+  <button onclick="showPage('profile',this)">
+    <span class="nav-icon">👤</span>
+    <span>Profile</span>
+  </button>
+
+  <button onclick="showPage('updates',this)">
+    <span class="nav-icon">✨</span>
+    <span>Updates</span>
+  </button>
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
