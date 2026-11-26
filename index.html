@@ -697,6 +697,14 @@ if (coverFile) {
 
   cover = `https://gpyuzxcrpqzqphmnbdxa.supabase.co/storage/v1/object/public/story-covers/${coverPath}`;
 }
+
+if (coverFile) {
+  message.textContent = 'កំពុង Upload រូបភាព Cover...';
+
+  coverPath = await uploadStoryCover(coverFile);
+
+  cover = `https://gpyuzxcrpqzqphmnbdxa.supabase.co/storage/v1/object/public/story-covers/${coverPath}`;
+}
   try {
     await adminRequest('/api/admin/stories', 'POST', {
       title,
