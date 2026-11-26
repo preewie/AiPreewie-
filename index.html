@@ -374,6 +374,209 @@ function filterStories(){
   document.querySelectorAll('.story').forEach(x=>x.classList.toggle('hide',!x.dataset.title.toLowerCase().includes(q)));
 }
 
+// ===== ADMIN STORY MANAGEMENT =====
+
+async function adminRequest(path, method = 'GET', body = null) {
+  const { data } = await supabaseClient.auth.getSession();
+  const session = data.session;
+
+  if (!session) {
+    throw new Error('សូម Login ជាមុនសិន');
+  }
+
+  const options = {
+    method,
+    headers: {
+      'Authorization': `Bearer ${session.access_token}`
+    }
+  };
+
+  if (body !== null) {
+    options.headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(
+    'https://aipreewie-backend.onrender.com' + path,
+    options
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'មានបញ្ហាក្នុងប្រព័ន្ធ');
+  }
+
+  return result;
+}
+
+// Escape text before displaying it
+function adminEscape(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[char]);
+}
+
+// Add new story
+async function adminCreateStory() {
+  const message = document.getElementById('storyFormMessage');
+
+  const title = document.getElementById('storyTitle').value.trim();
+  const description = document.getElementById('storyDescription').value;
+  const cover = document.getElementById('storyCover').value.trim();
+
+  const watchUSD = Number(document.getElementById('storyWatchUSD').value);
+  const downloadUSD = Number(document.getElementById('storyDownloadUSD').value);
+  const watchKHR = Number(document.getElementById('storyWatchKHR').value);
+  const downloadKHR = Number(document.getElementById('storyDownloadKHR').value);
+
+  if (!title) {
+    message.textContent = 'សូមបញ្ចូលឈ្មោះរឿង';
+    return;
+  }
+
+  if ([watchUSD, downloadUSD, watchKHR, downloadKHR].some(
+    value => !Number.isFinite(value) || value < 0
+  )) {
+    message.textContent = 'សូមពិនិត្យតម្លៃម្តងទៀត';
+    return;
+  }
+
+  const button = message.parentElement.querySelector('button');
+  button.disabled = true;
+  message.textContent = 'កំពុងរក្សាទុក...';
+
+  try {
+    await adminRequest('/api/admin/stories', 'POST', {
+      title,
+      description,
+      cover_url: cover || null,
+      price_usd: 0,
+      watch_price_usd: watchUSD,
+      download_price_usd: downloadUSD,
+      watch_price_khr: watchKHR,
+      download_price_khr: downloadKHR,
+      published:
+        document.getElementById('storyPublished').value === 'true'
+    });
+
+    message.textContent = 'បានបន្ថែមរឿងដោយជោគជ័យ!';
+
+    document.getElementById('storyTitle').value = '';
+    document.getElementById('storyDescription').value = '';
+    document.getElementById('storyCover').value = '';
+    document.getElementById('storyWatchUSD').value = '0';
+    document.getElementById('storyDownloadUSD').value = '0';
+    document.getElementById('storyWatchKHR').value = '0';
+    document.getElementById('storyDownloadKHR').value = '0';
+    document.getElementById('storyPublished').value = 'false';
+
+    await adminLoadStories();
+
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+// Load all stories
+async function adminLoadStories() {
+  const list = document.getElementById('adminStoriesList');
+  list.textContent = 'កំពុងផ្ទុកបញ្ជីរឿង...';
+
+  try {
+    const result = await adminRequest('/api/admin/stories');
+
+    if (!result.stories || result.stories.length === 0) {
+      list.textContent = 'មិនទាន់មានរឿងនៅក្នុងប្រព័ន្ធទេ។';
+      return;
+    }
+
+    list.innerHTML = result.stories.map(story => `
+      <div class="panel" style="margin-top:12px">
+        <h3>${adminEscape(story.title)}</h3>
+        <p>${adminEscape(story.description || '')}</p>
+        <p>Watch: $${Number(story.watch_price_usd || 0).toFixed(2)}</p>
+        <p>Download: $${Number(story.download_price_usd || 0).toFixed(2)}</p>
+        <p>Watch: ៛${Number(story.watch_price_khr || 0).toLocaleString()}</p>
+        <p>Download: ៛${Number(story.download_price_khr || 0).toLocaleString()}</p>
+        <p>ស្ថានភាព: ${story.published ? 'Published' : 'មិនទាន់ Publish'}</p>
+
+        <button class="primary" type="button"
+          onclick="adminEditStory('${adminEscape(story.id)}')">
+          ✏️ កែប្រែ
+        </button>
+
+        <button class="primary" type="button"
+          onclick="adminArchiveStory('${adminEscape(story.id)}')">
+          📦 Archive
+        </button>
+      </div>
+    `).join('');
+
+  } catch (error) {
+    list.textContent = error.message;
+  }
+}
+
+// Edit story title and description
+async function adminEditStory(id) {
+  const title = prompt('បញ្ចូលឈ្មោះរឿងថ្មី:');
+  if (title === null) return;
+
+  if (!title.trim()) {
+    alert('ឈ្មោះរឿងមិនអាចទទេបានទេ');
+    return;
+  }
+
+  const description = prompt('បញ្ចូលការពិពណ៌នាថ្មី:');
+  if (description === null) return;
+
+  try {
+    await adminRequest(
+      '/api/admin/stories/' + encodeURIComponent(id),
+      'PATCH',
+      {
+        title: title.trim(),
+        description
+      }
+    );
+
+    alert('បានកែប្រែរឿងជោគជ័យ');
+    await adminLoadStories();
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// Archive story
+async function adminArchiveStory(id) {
+  if (!confirm('តើអ្នកចង់ Archive រឿងនេះមែនទេ?')) {
+    return;
+  }
+
+  try {
+    await adminRequest(
+      '/api/admin/stories/' + encodeURIComponent(id),
+      'DELETE'
+    );
+
+    alert('បាន Archive រឿងជោគជ័យ');
+    await adminLoadStories();
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// ===== END ADMIN STORY MANAGEMENT =====
+
 renderBalance();
 renderHistory();
 </script>
