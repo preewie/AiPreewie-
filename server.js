@@ -164,6 +164,187 @@ app.get("/api/admin/check", requireAdmin, (req, res) => {
   });
 });
 
+// Admin: Get all stories
+app.get("/api/admin/stories", requireAdmin, async (req, res) => {
+  const { data, error } = await supabase
+    .from("stories")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Could not load stories"
+    });
+  }
+
+  res.json({ status: "success", stories: data });
+});
+
+// Admin: Create story
+app.post("/api/admin/stories", requireAdmin, async (req, res) => {
+  const {
+    title,
+    description = "",
+    cover_url = null,
+    price_usd = 0,
+    published = false,
+    watch_price_usd = 0,
+    download_price_usd = 0,
+    watch_price_khr = 0,
+    download_price_khr = 0
+  } = req.body || {};
+
+  const fields = [
+    price_usd,
+    watch_price_usd,
+    download_price_usd,
+    watch_price_khr,
+    download_price_khr
+  ];
+
+  if (
+    typeof title !== "string" ||
+    !title.trim() ||
+    title.length > 200 ||
+    typeof description !== "string" ||
+    typeof published !== "boolean" ||
+    fields.some(v => typeof v !== "number" || !Number.isFinite(v) || v < 0)
+  ) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid story information"
+    });
+  }
+
+  const { data, error } = await supabase
+    .from("stories")
+    .insert({
+      title: title.trim(),
+      description,
+      cover_url,
+      price_usd,
+      published,
+      watch_price_usd,
+      download_price_usd,
+      watch_price_khr,
+      download_price_khr
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Could not create story"
+    });
+  }
+
+  res.status(201).json({
+    status: "success",
+    story: data
+  });
+});
+
+// Admin: Update story
+app.patch("/api/admin/stories/:id", requireAdmin, async (req, res) => {
+  const allowed = [
+    "title",
+    "description",
+    "cover_url",
+    "price_usd",
+    "published",
+    "watch_price_usd",
+    "download_price_usd",
+    "watch_price_khr",
+    "download_price_khr"
+  ];
+
+  const updates = {};
+  for (const key of allowed) {
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, key)) {
+      updates[key] = req.body[key];
+    }
+  }
+
+  if (
+    Object.keys(updates).length === 0 ||
+    (updates.title !== undefined &&
+      (typeof updates.title !== "string" || !updates.title.trim())) ||
+    (updates.description !== undefined &&
+      typeof updates.description !== "string") ||
+    (updates.published !== undefined &&
+      typeof updates.published !== "boolean") ||
+    ["price_usd", "watch_price_usd", "download_price_usd",
+      "watch_price_khr", "download_price_khr"].some(key =>
+        updates[key] !== undefined &&
+        (typeof updates[key] !== "number" ||
+         !Number.isFinite(updates[key]) || updates[key] < 0)
+      )
+  ) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid story update"
+    });
+  }
+
+  if (updates.title !== undefined) {
+    updates.title = updates.title.trim();
+  }
+
+  const { data, error } = await supabase
+    .from("stories")
+    .update(updates)
+    .eq("id", req.params.id)
+    .select()
+    .maybeSingle();
+
+  if (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Could not update story"
+    });
+  }
+
+  if (!data) {
+    return res.status(404).json({
+      status: "error",
+      message: "Story not found"
+    });
+  }
+
+  res.json({ status: "success", story: data });
+});
+
+// Admin: Archive story instead of permanently deleting it
+app.delete("/api/admin/stories/:id", requireAdmin, async (req, res) => {
+  const { data, error } = await supabase
+    .from("stories")
+    .update({ published: false })
+    .eq("id", req.params.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    return res.status(500).json({
+      status: "error",
+      message: "Could not archive story"
+    });
+  }
+
+  if (!data) {
+    return res.status(404).json({
+      status: "error",
+      message: "Story not found"
+    });
+  }
+
+  res.json({
+    status: "success",
+    message: "Story archived"
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`AiPreewie server running on port ${PORT}`);
 });
