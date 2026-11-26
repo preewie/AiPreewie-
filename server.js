@@ -1,5 +1,6 @@
 
 const express = require("express");
+const multer = require("multer");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
