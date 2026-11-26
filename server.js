@@ -30,7 +30,24 @@ app.get("/", (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+app.get("/db-check", async (req, res) => {
+  const { data, error } = await supabase
+    .from("stories")
+    .select("id")
+    .limit(1);
 
+  if (error) {
+    return res.status(500).json({
+      status: "error",
+      message: error.message
+    });
+  }
+
+  res.json({
+    status: "connected",
+    message: "Supabase database connected"
+  });
+});
 app.listen(PORT, () => {
   console.log(`AiPreewie server running on port ${PORT}`);
 });
