@@ -33,19 +33,41 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
 </header>
 <main>
 <div id="home">
-  <div class="welcome"><h2>🎬 Welcome to AiPreewie</h2><p>រឿង និងវីដេអូកម្សាន្តដែលអ្នកចូលចិត្ត</p></div>
-  <div class="search"><span>🔎</span><input id="searchInput" placeholder="ស្វែងរករឿង..." oninput="filterStories()"></div>
-  <section><h2>📖 រឿងថ្មីៗ</h2><div class="grid" id="storyGrid">
-    <article class="tile story" data-title="រឿងស្នេហានិងវាសនា"><div class="tile-art">រឿងស្នេហា<br>និងវាសនា</div><div class="tile-body"><h3>រឿងស្នេហានិងវាសនា</h3><p>រឿងថ្មីៗ • កម្សាន្ត</p></div></article>
-    <article class="tile story" data-title="អាថ៌កំបាំងគ្រួសារ"><div class="tile-art">អាថ៌កំបាំង<br>គ្រួសារ</div><div class="tile-body"><h3>អាថ៌កំបាំងគ្រួសារ</h3><p>រឿងថ្មីៗ • កម្សាន្ត</p></div></article>
-  </div><p class="small">គំរូបង្ហាញមុខងារ។ អាចភ្ជាប់រឿងពិត និងប្រព័ន្ធគ្រប់គ្រងនៅពេលក្រោយ។</p></section>
-</div>
-<div id="library" class="hide"><section><h2>📚 Purchased</h2><div class="panel empty">រឿងដែលអ្នកបានទិញនឹងបង្ហាញនៅទីនេះ។</div></section></div>
-<div id="history" class="hide"><section><h2>🧾 History</h2><div class="panel empty" id="historyList">មិនទាន់មានប្រវត្តិប្រតិបត្តិការ។</div></section></div>
-<div id="wallet" class="hide">
-  <section><h2>💰 Wallet / Credit</h2>
-    <div class="wallet"><h3>Credit Balance</h3><div class="balance" id="usdBalance">$0.00 USD</div><div class="secondary" id="khrBalance">៛0 KHR</div><div class="wallet-note">អត្រាបង្ហាញគំរូ: $1 = ៛4,100</div></div>
-    <div class="panel"><h3>បន្ថែម Credit (Demo)</h3><input class="field" id="addAmount" type="number" min="0" step="0.01" placeholder="ចំនួន USD"><button class="primary" onclick="addDemoCredit()">បន្ថែម (Demo)</button><p class="small">នេះជាការសាកល្បងក្នុង Browser ប៉ុណ្ណោះ។ មិនទាន់មានការទូទាត់เงินจริงទេ។</p></div>
+  <div class="welcome">
+    <h2>🎬 Welcome to AiPreewie</h2>
+    <p>រឿង និងវីដេអូកម្សាន្តដែលអ្នកចូលចិត្ត</p>
+  </div>
+
+  <div class="store-tabs">
+    <button class="store-tab active" onclick="switchStoreTab('watch',this)">
+      🎬 មើលវីដេអូ
+    </button>
+    <button class="store-tab" onclick="switchStoreTab('download',this)">
+      📥 ទិញរឿងយកទៅផុស
+    </button>
+    <button class="store-tab" onclick="switchStoreTab('purchases',this)">
+      📚 ការទិញរបស់ខ្ញុំ
+    </button>
+  </div>
+
+  <div class="search">
+    <span>🔎</span>
+    <input id="searchInput"
+      placeholder="ស្វែងរករឿង..."
+      oninput="filterStoreStories()">
+  </div>
+
+  <div class="telegram-link">
+    <a id="telegramLink" href="#" onclick="return false">
+      ✈️ មើលរឿងក្នុង Telegram
+    </a>
+  </div>
+
+  <section>
+    <h2 id="storeHeading">🎬 រឿងសម្រាប់មើល</h2>
+    <div class="grid store-grid" id="storeStoryGrid">
+      <p class="empty">កំពុងផ្ទុករឿង...</p>
+    </div>
   </section>
 </div>
 
