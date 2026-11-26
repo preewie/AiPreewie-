@@ -1,11 +1,5 @@
 
 const express = require("express");
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 50 * 1024 * 1024
-  }
-});
 const multer = require("multer");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -13,7 +7,12 @@ const rateLimit = require("express-rate-limit");
 const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
-
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 50 * 1024 * 1024
+  }
+});
 const PORT = process.env.PORT || 10000;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
