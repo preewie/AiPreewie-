@@ -1,5 +1,11 @@
 
 const express = require("express");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 50 * 1024 * 1024
+  }
+});
 const multer = require("multer");
 const cors = require("cors");
 const helmet = require("helmet");
