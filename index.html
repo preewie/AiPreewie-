@@ -89,6 +89,66 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
   </section>
 </div>
 
+<div id="admin" class="hide">
+  <section>
+    <h2>🛡️ Admin Dashboard</h2>
+
+    <div class="welcome">
+      <h2>សូមស្វាគមន៍មកកាន់ Admin</h2>
+      <p>ប្រព័ន្ធគ្រប់គ្រង AiPreewie</p>
+    </div>
+
+    <div class="grid">
+      <div class="tile">
+        <div class="tile-body">
+          <h3>📚 គ្រប់គ្រងរឿង</h3>
+          <p>បន្ថែម កែប្រែ និងលុបរឿង</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-body">
+          <h3>📹 គ្រប់គ្រងវីដេអូ</h3>
+          <p>Upload វីដេអូពេញ និង Highlight</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-body">
+          <h3>💳 គ្រប់គ្រងការទូទាត់</h3>
+          <p>ពិនិត្យ និងបញ្ជាក់ការបង់ប្រាក់</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-body">
+          <h3>📱 គ្រប់គ្រង QR Code</h3>
+          <p>ប្ដូរ និងកំណត់ QR ទូទាត់ប្រាក់</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-body">
+          <h3>👥 គ្រប់គ្រងអតិថិជន</h3>
+          <p>មើលព័ត៌មានគណនី និងការទិញ</p>
+        </div>
+      </div>
+
+      <div class="tile">
+        <div class="tile-body">
+          <h3>📊 របាយការណ៍</h3>
+          <p>ចំណូល និងចំនួនអ្នកទិញ</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>🔔 ស្ថានភាពប្រព័ន្ធ</h3>
+      <p>Admin Dashboard កំពុងរៀបចំមុខងារ។</p>
+    </div>
+  </section>
+</div>
+
 <div id="updates" class="hide"><section><h2>✨ Updates</h2><div class="panel">Updates will appear here.</div></section></div>
 </main>
 <nav class="bottom">
@@ -250,7 +310,7 @@ function renderHistory(){
 }
 
 function showPage(id,btn){
-  ['home','library','history','wallet','profile','updates'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));
+  ['home','library','history','wallet','profile','updates','admin'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));
   document.querySelectorAll('header .tabs button,.bottom button').forEach(x=>x.classList.remove('active'));
   if(btn)btn.classList.add('active');
 }
