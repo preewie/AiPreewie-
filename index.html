@@ -89,6 +89,8 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
   </section>
 </div>
 
+
+
 <div id="admin" class="hide">
   <section>
     <h2>🛡️ Admin Dashboard</h2>
@@ -98,14 +100,65 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
       <p>ប្រព័ន្ធគ្រប់គ្រង AiPreewie</p>
     </div>
 
-    <div class="grid">
-      <div class="tile">
-        <div class="tile-body">
-          <h3>📚 គ្រប់គ្រងរឿង</h3>
-          <p>បន្ថែម កែប្រែ និងលុបរឿង</p>
-        </div>
-      </div>
+    <div class="panel">
+      <h3>📚 បន្ថែមរឿងថ្មី</h3>
 
+      <label>ឈ្មោះរឿង</label>
+      <input id="storyTitle" type="text"
+        placeholder="បញ្ចូលឈ្មោះរឿង">
+
+      <label>ការពិពណ៌នារឿង</label>
+      <textarea id="storyDescription"
+        placeholder="បញ្ចូលការពិពណ៌នារឿង"></textarea>
+
+      <label>Cover Image URL</label>
+      <input id="storyCover" type="url"
+        placeholder="ដាក់ Link រូបភាព Cover">
+
+      <label>តម្លៃ Watch (USD)</label>
+      <input id="storyWatchUSD" type="number"
+        min="0" step="0.01" value="0">
+
+      <label>តម្លៃ Download (USD)</label>
+      <input id="storyDownloadUSD" type="number"
+        min="0" step="0.01" value="0">
+
+      <label>តម្លៃ Watch (KHR)</label>
+      <input id="storyWatchKHR" type="number"
+        min="0" step="1" value="0">
+
+      <label>តម្លៃ Download (KHR)</label>
+      <input id="storyDownloadKHR" type="number"
+        min="0" step="1" value="0">
+
+      <label>ស្ថានភាពរឿង</label>
+      <select id="storyPublished">
+        <option value="false">មិនទាន់ Publish</option>
+        <option value="true">Publish</option>
+      </select>
+
+      <button class="primary" type="button"
+        onclick="adminCreateStory()">
+        ➕ បន្ថែមរឿង
+      </button>
+
+      <p id="storyFormMessage"></p>
+    </div>
+
+    <div class="panel">
+      <h3>📖 បញ្ជីរឿងទាំងអស់</h3>
+
+      <button class="primary" type="button"
+        onclick="adminLoadStories()">
+        🔄 ផ្ទុកបញ្ជីរឿង
+      </button>
+
+      <div id="adminStoriesList">
+        <p>ចុចផ្ទុកបញ្ជីរឿង ដើម្បីមើលទិន្នន័យ។</p>
+      </div>
+    </div>
+
+    <div class="grid">
       <div class="tile">
         <div class="tile-body">
           <h3>📹 គ្រប់គ្រងវីដេអូ</h3>
@@ -144,10 +197,11 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
 
     <div class="panel">
       <h3>🔔 ស្ថានភាពប្រព័ន្ធ</h3>
-      <p>Admin Dashboard កំពុងរៀបចំមុខងារ។</p>
+      <p>Admin Story Management កំពុងរៀបចំ។</p>
     </div>
   </section>
 </div>
+
 
 <div id="updates" class="hide"><section><h2>✨ Updates</h2><div class="panel">Updates will appear here.</div></section></div>
 </main>
