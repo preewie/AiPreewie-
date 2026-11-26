@@ -687,8 +687,6 @@ async function adminCreateStory() {
   const button = message.parentElement.querySelector('button');
   button.disabled = true;
   message.textContent = 'កំពុងរក្សាទុក...';
-let coverPath = null;
-let cover = null;
 
 if (coverFile) {
   message.textContent = 'កំពុង Upload រូបភាព Cover...';
@@ -697,15 +695,16 @@ if (coverFile) {
 
   cover = `https://gpyuzxcrpqzqphmnbdxa.supabase.co/storage/v1/object/public/story-covers/${coverPath}`;
 }
+  try {    let coverPath = null;
+    let cover = null;
 
-if (coverFile) {
-  message.textContent = 'កំពុង Upload រូបភាព Cover...';
+    if (coverFile) {
+      message.textContent = 'កំពុង Upload រូបភាព Cover...';
 
-  coverPath = await uploadStoryCover(coverFile);
+      coverPath = await uploadStoryCover(coverFile);
 
-  cover = `https://gpyuzxcrpqzqphmnbdxa.supabase.co/storage/v1/object/public/story-covers/${coverPath}`;
-}
-  try {
+      cover = `https://gpyuzxcrpqzqphmnbdxa.supabase.co/storage/v1/object/public/story-covers/${coverPath}`;
+    }
     await adminRequest('/api/admin/stories', 'POST', {
       title,
       description,
