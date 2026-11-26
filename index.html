@@ -113,6 +113,69 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
   }
 }
 
+/* AiPreewie Bottom Navigation Modern */
+
+.bottom {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 1000;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+
+  padding: 10px;
+  background: rgba(18, 27, 46, 0.97);
+  border: 1px solid #293955;
+  border-radius: 22px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  backdrop-filter: blur(16px);
+}
+
+.bottom button {
+  min-width: 0;
+  min-height: 62px;
+  padding: 8px 2px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  background: #1b2940;
+  color: #aab8cc;
+  border: 1px solid #34445e;
+  border-radius: 15px;
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  transition: 0.2s ease;
+}
+
+.bottom button .nav-icon {
+  font-size: 21px;
+  line-height: 1;
+}
+
+.bottom button.active {
+  background: linear-gradient(145deg, #c8324d, #8e2038);
+  color: #fff;
+  border-color: #e45b68;
+  box-shadow: 0 4px 14px rgba(200,50,77,0.25);
+}
+
+.bottom button:active {
+  transform: scale(0.95);
+}
+
+body {
+  padding-bottom: 105px;
+}
+
 </style>
 </head>
 <body>
