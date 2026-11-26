@@ -561,9 +561,17 @@ function renderHistory(){
 }
 
 function showPage(id,btn){
-  ['home','library','history','wallet','profile','updates','admin'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));
-  document.querySelectorAll('header .tabs button,.bottom button').forEach(x=>x.classList.remove('active'));
-  if(btn)btn.classList.add('active');
+  ['home','library','history','wallet','profile','updates','admin'].forEach(x=>{
+    const page = document.getElementById(x);
+    if(page){
+      page.classList.toggle('hide',x!==id);
+    }
+  });
+
+  document.querySelectorAll('header .tabs button,.bottom button')
+    .forEach(x=>x.classList.remove('active'));
+
+  if(btn) btn.classList.add('active');
 }
 
 function filterStories(){
