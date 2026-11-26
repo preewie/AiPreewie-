@@ -627,7 +627,38 @@ function adminEscape(value) {
     "'": '&#39;'
   })[char]);
 }
+// Upload cover image
+async function uploadStoryCover(file) {
+  const { data } = await supabaseClient.auth.getSession();
+  const session = data.session;
 
+  if (!session) {
+    throw new Error('សូម Login ជាមុនសិន');
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('bucket', 'story-covers');
+
+  const response = await fetch(
+    'https://aipreewie-backend.onrender.com/api/admin/upload',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`
+      },
+      body: formData
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'Upload រូបភាពមិនបាន');
+  }
+
+  return result.path;
+}
 // Add new story
 async function adminCreateStory() {
   const message = document.getElementById('storyFormMessage');
