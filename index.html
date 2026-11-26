@@ -54,15 +54,58 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
 <nav class="bottom">
 <button class="active" onclick="showPage('home',this)">🏠 Home</button><button onclick="showPage('library',this)">📚 Library</button><button onclick="showPage('profile',this)">👤 Profile</button><button onclick="showPage('updates',this)">✨ Updates</button>
 </nav>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 const RATE=4100;
+
+const SUPABASE_URL = "https://gpyuzxcrpqzqphmnbdxa.supabase.co";
+const SUPABASE_KEY = "sb_publishable_p09DvsMruWjWR8kVu4ojqA_QM54qER4";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
 let balance=Number(localStorage.getItem('aipreewie_demo_usd')||0);
-function renderBalance(){document.getElementById('usdBalance').textContent='$'+balance.toFixed(2)+' USD';document.getElementById('khrBalance').textContent='៛'+Math.round(balance*RATE).toLocaleString('en-US')+' KHR';}
-function addDemoCredit(){const val=Number(document.getElementById('addAmount').value);if(!val||val<=0){alert('សូមបញ្ចូលចំនួនទឹកប្រាក់');return;}balance+=val;localStorage.setItem('aipreewie_demo_usd',balance);const old=localStorage.getItem('aipreewie_demo_history')||'';const item='Added demo credit $'+val.toFixed(2)+' / ៛'+Math.round(val*RATE).toLocaleString('en-US');localStorage.setItem('aipreewie_demo_history',old?old+'|'+item:item);document.getElementById('addAmount').value='';renderBalance();renderHistory();alert('បានបន្ថែម Demo Credit');}
-function renderHistory(){const h=(localStorage.getItem('aipreewie_demo_history')||'').split('|').filter(Boolean).reverse();document.getElementById('historyList').innerHTML=h.length?h.map(x=>'<p>'+x+'</p>').join(''):'មិនទាន់មានប្រវត្តិប្រតិបត្តិការ។';}
-function showPage(id,btn){['home','library','history','wallet','profile','updates'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));document.querySelectorAll('header .tabs button,.bottom button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');}
-function filterStories(){const q=document.getElementById('searchInput').value.toLowerCase();document.querySelectorAll('.story').forEach(x=>x.classList.toggle('hide',!x.dataset.title.toLowerCase().includes(q)));}
-renderBalance();renderHistory();
+
+function renderBalance(){
+  document.getElementById('usdBalance').textContent='$'+balance.toFixed(2)+' USD';
+  document.getElementById('khrBalance').textContent='៛'+Math.round(balance*RATE).toLocaleString('en-US')+' KHR';
+}
+
+function addDemoCredit(){
+  const val=Number(document.getElementById('addAmount').value);
+  if(!val||val<=0){alert('សូមបញ្ចូលចំនួនទឹកប្រាក់');return;}
+  balance+=val;
+  localStorage.setItem('aipreewie_demo_usd',balance);
+  const old=localStorage.getItem('aipreewie_demo_history')||'';
+  const item='Added demo credit $'+val.toFixed(2)+' / ៛'+Math.round(val*RATE).toLocaleString('en-US');
+  localStorage.setItem('aipreewie_demo_history',old?old+'|'+item:item);
+  document.getElementById('addAmount').value='';
+  renderBalance();
+  renderHistory();
+  alert('បានបន្ថែម Demo Credit');
+}
+
+function renderHistory(){
+  const h=(localStorage.getItem('aipreewie_demo_history')||'').split('|').filter(Boolean).reverse();
+  document.getElementById('historyList').innerHTML=h.length?h.map(x=>'<p>'+x+'</p>').join(''):'មិនទាន់មានប្រវត្តិប្រតិបត្តិការ។';
+}
+
+function showPage(id,btn){
+  ['home','library','history','wallet','profile','updates'].forEach(x=>document.getElementById(x).classList.toggle('hide',x!==id));
+  document.querySelectorAll('header .tabs button,.bottom button').forEach(x=>x.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+}
+
+function filterStories(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.story').forEach(x=>x.classList.toggle('hide',!x.dataset.title.toLowerCase().includes(q)));
+}
+
+renderBalance();
+renderHistory();
 </script>
 </body>
 </html>
