@@ -48,6 +48,25 @@ app.get("/db-check", async (req, res) => {
     message: "Supabase database connected"
   });
 });
+app.get("/api/stories", async (req, res) => {
+  const { data, error } = await supabase
+    .from("stories")
+    .select("*")
+    .eq("published", true)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return res.status(500).json({
+      status: "error",
+      message: error.message
+    });
+  }
+
+  res.json({
+    status: "success",
+    stories: data
+  });
+});
 app.listen(PORT, () => {
   console.log(`AiPreewie server running on port ${PORT}`);
 });
