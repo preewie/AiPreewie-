@@ -19,6 +19,100 @@ section{margin-top:30px}section h2{font-size:23px;margin:0 0 18px}.grid{display:
 .bottom{position:fixed;bottom:0;left:0;right:0;z-index:6;background:#0c1222;border-top:1px solid var(--border);padding:12px 8px max(12px,env(safe-area-inset-bottom));display:flex;justify-content:space-around}.bottom button{background:none;border:0;color:var(--muted);font-size:14px;padding:8px 4px}.bottom button.active{color:var(--gold)}
 .hide{display:none!important}.empty{color:var(--muted);text-align:center;padding:28px 12px}.small{font-size:13px;color:var(--muted)}
 @media(min-width:700px){main{padding:28px}.tile-art{height:210px}.grid{gap:18px}}
+
+/* ===== AiPreewie Store Design ===== */
+
+.store-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.store-tab {
+  min-width: 0;
+  min-height: 76px;
+  padding: 10px 5px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--panel2);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.store-tab.active {
+  background: #b52e45;
+  border-color: #e45b68;
+  color: white;
+}
+
+.store-tab:nth-child(2).active {
+  background: #a87518;
+  border-color: #ffc44d;
+  color: white;
+}
+
+.store-tab:nth-child(3).active {
+  background: #285c9e;
+  border-color: #5797e5;
+  color: white;
+}
+
+.store-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.store-grid .tile-art {
+  height: 145px;
+  font-size: 15px;
+}
+
+.store-grid .tile-body {
+  padding: 9px;
+}
+
+.store-grid .tile-body h3 {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.store-grid .tile-body p {
+  font-size: 12px;
+}
+
+.telegram-link {
+  margin: -10px 0 22px;
+  text-align: center;
+}
+
+.telegram-link a {
+  display: block;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  color: #68b8ff;
+  text-decoration: none;
+  background: var(--panel);
+  font-weight: 700;
+}
+
+@media (max-width: 360px) {
+  .store-tab {
+    font-size: 11px;
+    padding: 8px 3px;
+  }
+
+  .store-grid .tile-art {
+    height: 120px;
+  }
+}
+
 </style>
 </head>
 <body>
