@@ -290,9 +290,11 @@ body {
       <textarea id="storyDescription"
         placeholder="បញ្ចូលការពិពណ៌នារឿង"></textarea>
 
-      <label>Cover Image URL</label>
-      <input id="storyCover" type="url"
-        placeholder="ដាក់ Link រូបភាព Cover">
+    <label>រូបភាព Cover រឿង</label>
+<input id="storyCoverFile" type="file"
+  accept="image/jpeg,image/png,image/webp">
+
+<div id="coverUploadMessage" style="font-size:13px;margin-top:6px"></div>
 
       <label>តម្លៃ Watch (USD)</label>
       <input id="storyWatchUSD" type="number"
