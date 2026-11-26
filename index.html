@@ -665,7 +665,7 @@ async function adminCreateStory() {
 
   const title = document.getElementById('storyTitle').value.trim();
   const description = document.getElementById('storyDescription').value;
-  const cover = document.getElementById('storyCover').value.trim();
+  const coverFile = document.getElementById('storyCoverFile').files[0];
 
   const watchUSD = Number(document.getElementById('storyWatchUSD').value);
   const downloadUSD = Number(document.getElementById('storyDownloadUSD').value);
@@ -687,7 +687,16 @@ async function adminCreateStory() {
   const button = message.parentElement.querySelector('button');
   button.disabled = true;
   message.textContent = 'កំពុងរក្សាទុក...';
+let coverPath = null;
+let cover = null;
 
+if (coverFile) {
+  message.textContent = 'កំពុង Upload រូបភាព Cover...';
+
+  coverPath = await uploadStoryCover(coverFile);
+
+  cover = `https://gpyuzxcrpqzqphmnbdxa.supabase.co/storage/v1/object/public/story-covers/${coverPath}`;
+}
   try {
     await adminRequest('/api/admin/stories', 'POST', {
       title,
