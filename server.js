@@ -353,7 +353,10 @@ app.patch("/api/admin/stories/:id", requireAdmin, async (req, res) => {
     "watch_price_usd",
     "download_price_usd",
     "watch_price_khr",
-    "download_price_khr"
+    "download_price_khr",
+    "highlight_video_path",
+    "watch_video_path",
+    "download_video_path"
   ];
 
   const updates = {};
