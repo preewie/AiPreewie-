@@ -705,13 +705,6 @@ async function adminCreateStory() {
   button.disabled = true;
   message.textContent = 'កំពុងរក្សាទុក...';
 
-if (coverFile) {
-  message.textContent = 'កំពុង Upload រូបភាព Cover...';
-
-  coverPath = await uploadStoryCover(coverFile);
-
-  cover = `https://gpyuzxcrpqzqphmnbdxa.supabase.co/storage/v1/object/public/story-covers/${coverPath}`;
-}
   try {    let coverPath = null;
     let cover = null;
 
