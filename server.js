@@ -97,6 +97,8 @@ app.post(
   requireAdmin,
   upload.single("file"),
   async (req, res) => {
+    console.log("UPLOAD ROUTE REACHED");
+
     try {
       if (!req.file) {
         return res.status(400).json({
@@ -129,31 +131,53 @@ app.post(
       }
 
       const fileExt = req.file.originalname.split(".").pop();
-      const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
 
-      const { data, error } = await supabase.storage
+      const filePath =
+        `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+
+      console.log("START SUPABASE UPLOAD:", bucket);
+
+      const uploadPromise = supabase.storage
         .from(bucket)
         .upload(filePath, req.file.buffer, {
           contentType: req.file.mimetype,
           upsert: false
         });
 
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error("Supabase upload timeout"));
+        }, 30000);
+      });
+
+      const { data, error } = await Promise.race([
+        uploadPromise,
+        timeoutPromise
+      ]);
+
       if (error) {
+        console.error("SUPABASE UPLOAD ERROR:", error);
+
         return res.status(500).json({
           status: "error",
-          message: "Upload failed"
+          message: error.message || "Upload failed"
         });
       }
 
-      res.json({
+      console.log("UPLOAD SUCCESS:", data.path);
+
+      return res.json({
         status: "success",
         bucket,
         path: data.path
       });
+
     } catch (error) {
-      res.status(500).json({
+      console.error("UPLOAD ROUTE ERROR:", error);
+
+      return res.status(500).json({
         status: "error",
-        message: "Server upload error"
+        message: error.message || "Server upload error"
       });
     }
   }
