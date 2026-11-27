@@ -627,6 +627,7 @@ function adminEscape(value) {
     "'": '&#39;'
   })[char]);
 }
+  
 // Upload cover image
 async function uploadStoryCover(file) {
   const { data } = await supabaseClient.auth.getSession();
@@ -640,24 +641,40 @@ async function uploadStoryCover(file) {
   formData.append('file', file);
   formData.append('bucket', 'story-covers');
 
-  const response = await fetch(
-    'https://aipreewie-backend.onrender.com/api/admin/upload',
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`
-      },
-      body: formData
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+
+  try {
+    const response = await fetch(
+      'https://aipreewie-backend.onrender.com/api/admin/upload',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: formData,
+        signal: controller.signal
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Upload រូបភាពមិនបាន');
     }
-  );
 
-  const result = await response.json();
+    return result.path;
 
-  if (!response.ok) {
-    throw new Error(result.message || 'Upload រូបភាពមិនបាន');
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Upload ចំណាយពេលយូរពេក។ សូមសាកម្ដងទៀត');
+    }
+
+    throw error;
+
+  } finally {
+    clearTimeout(timeout);
   }
-
-  return result.path;
 }
 // Add new story
 async function adminCreateStory() {
