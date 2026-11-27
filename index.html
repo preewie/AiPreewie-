@@ -817,6 +817,59 @@ async function deleteStoryVideo(storyId, videoType) {
     }
   );
 }
+  // Admin upload video button
+async function adminUploadVideo(storyId, videoType) {
+  const input = document.getElementById(
+    `video_${videoType}_${storyId}`
+  );
+
+  const file = input.files[0];
+
+  if (!file) {
+    alert('សូមជ្រើសរើសវីដេអូជាមុនសិន');
+    return;
+  }
+
+  if (file.type !== 'video/mp4') {
+    alert('សូមជ្រើសរើសវីដេអូ MP4');
+    return;
+  }
+
+  if (!confirm('តើអ្នកចង់ Upload វីដេអូនេះមែនទេ?')) {
+    return;
+  }
+
+  try {
+    alert('កំពុង Upload វីដេអូ...');
+
+    await uploadStoryVideo(file, storyId, videoType);
+
+    alert('Upload វីដេអូបានជោគជ័យ!');
+
+    await adminLoadStories();
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// Admin delete video button
+async function adminDeleteVideo(storyId, videoType) {
+  if (!confirm('តើអ្នកចង់លុបវីដេអូនេះមែនទេ?')) {
+    return;
+  }
+
+  try {
+    await deleteStoryVideo(storyId, videoType);
+
+    alert('បានលុបវីដេអូជោគជ័យ!');
+
+    await adminLoadStories();
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
 // Load all stories
 async function adminLoadStories() {
   const list = document.getElementById('adminStoriesList');
