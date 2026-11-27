@@ -934,6 +934,16 @@ async function adminDeleteVideo(storyId, videoType) {
     alert(error.message);
   }
 }
+// Open / Close story management
+let adminOpenStoryId = null;
+
+function toggleAdminStoryManage(storyId) {
+  adminOpenStoryId =
+    adminOpenStoryId === storyId ? null : storyId;
+
+  adminLoadStories();
+}
+
 // Load all stories
 async function adminLoadStories() {
   const list = document.getElementById('adminStoriesList');
@@ -947,94 +957,162 @@ async function adminLoadStories() {
       return;
     }
 
-    list.innerHTML = result.stories.map(story => `
-      <div class="panel" style="margin-top:12px">
-        <h3>${adminEscape(story.title)}</h3>
-        <p>${adminEscape(story.description || '')}</p>
+    list.innerHTML = `
+      <div class="admin-stories-grid">
+        ${result.stories.map(story => `
+          <div class="admin-story-card">
 
-        <p>Watch: $${Number(story.watch_price_usd || 0).toFixed(2)}</p>
-        <p>Download: $${Number(story.download_price_usd || 0).toFixed(2)}</p>
-        <p>Watch: ៛${Number(story.watch_price_khr || 0).toLocaleString()}</p>
-        <p>Download: ៛${Number(story.download_price_khr || 0).toLocaleString()}</p>
+            ${story.cover_url ? `
+              <img
+                class="admin-story-cover"
+                src="${adminEscape(story.cover_url)}"
+                alt="${adminEscape(story.title)}"
+              >
+            ` : `
+              <div class="admin-story-cover"
+                style="display:flex;align-items:center;justify-content:center;color:var(--muted)">
+                📚
+              </div>
+            `}
 
-        <p>ស្ថានភាព: ${story.published ? 'Published' : 'មិនទាន់ Publish'}</p>
+            <div class="admin-story-info">
 
-        <hr>
+              <h3>${adminEscape(story.title)}</h3>
 
-        <h4>🎬 Highlight Video</h4>
-        <p>${story.highlight_video_path ? 'មានវីដេអូរួចហើយ' : 'មិនទាន់មានវីដេអូ'}</p>
-        <input type="file" accept="video/mp4"
-          id="video_highlight_${adminEscape(story.id)}">
+              <p>
+                ${story.published
+                  ? '🟢 Published'
+                  : '🟠 Draft'}
+              </p>
 
-        <button class="primary" type="button"
-          onclick="adminUploadVideo('${adminEscape(story.id)}','highlight')">
-          ⬆️ Upload / Replace Highlight
-        </button>
+              <p>
+                Watch: $${Number(story.watch_price_usd || 0).toFixed(2)}
+              </p>
 
-        ${story.highlight_video_path ? `
-          <button class="primary" type="button"
-            onclick="adminDeleteVideo('${adminEscape(story.id)}','highlight')">
-            🗑️ Delete Highlight
-          </button>
-        ` : ''}
+              <p>
+                Download: $${Number(story.download_price_usd || 0).toFixed(2)}
+              </p>
 
-        <hr>
+              <p>
+                Watch: ៛${Number(story.watch_price_khr || 0).toLocaleString()}
+              </p>
 
-        <h4>📺 Watch Video</h4>
-        <p>${story.watch_video_path ? 'មានវីដេអូរួចហើយ' : 'មិនទាន់មានវីដេអូ'}</p>
-        <input type="file" accept="video/mp4"
-          id="video_watch_${adminEscape(story.id)}">
+              <p>
+                Download: ៛${Number(story.download_price_khr || 0).toLocaleString()}
+              </p>
 
-        <button class="primary" type="button"
-          onclick="adminUploadVideo('${adminEscape(story.id)}','watch')">
-          ⬆️ Upload / Replace Watch
-        </button>
+              <button class="primary" type="button"
+                onclick="toggleAdminStoryManage('${adminEscape(story.id)}')">
+                ${adminOpenStoryId === story.id
+                  ? '🔼 បិទការគ្រប់គ្រង'
+                  : '⚙️ គ្រប់គ្រង'}
+              </button>
 
-        ${story.watch_video_path ? `
-          <button class="primary" type="button"
-            onclick="adminDeleteVideo('${adminEscape(story.id)}','watch')">
-            🗑️ Delete Watch
-          </button>
-        ` : ''}
+            </div>
 
-        <hr>
+            ${adminOpenStoryId === story.id ? `
+              <div class="admin-story-details">
 
-        <h4>📥 Download Video</h4>
-        <p>${story.download_video_path ? 'មានវីដេអូរួចហើយ' : 'មិនទាន់មានវីដេអូ'}</p>
-        <input type="file" accept="video/mp4"
-          id="video_download_${adminEscape(story.id)}">
+                <h4>🎬 Highlight Video</h4>
 
-        <button class="primary" type="button"
-          onclick="adminUploadVideo('${adminEscape(story.id)}','download')">
-          ⬆️ Upload / Replace Download
-        </button>
+                <p>
+                  ${story.highlight_video_path
+                    ? 'មានវីដេអូរួចហើយ'
+                    : 'មិនទាន់មានវីដេអូ'}
+                </p>
 
-        ${story.download_video_path ? `
-          <button class="primary" type="button"
-            onclick="adminDeleteVideo('${adminEscape(story.id)}','download')">
-            🗑️ Delete Download
-          </button>
-        ` : ''}
+                <input type="file"
+                  accept="video/mp4"
+                  id="video_highlight_${adminEscape(story.id)}">
 
-        <hr>
+                <button class="primary" type="button"
+                  onclick="adminUploadVideo('${adminEscape(story.id)}','highlight')">
+                  ⬆️ Upload / Replace Highlight
+                </button>
 
-        <button class="primary" type="button"
-          onclick="adminEditStory('${adminEscape(story.id)}')">
-          ✏️ កែប្រែ
-        </button>
+                ${story.highlight_video_path ? `
+                  <button class="primary" type="button"
+                    onclick="adminDeleteVideo('${adminEscape(story.id)}','highlight')">
+                    🗑️ Delete Highlight
+                  </button>
+                ` : ''}
 
-        <button class="primary" type="button"
-          onclick="adminArchiveStory('${adminEscape(story.id)}')">
-          📦 Archive
-        </button>
+                <hr>
+
+                <h4>📺 Watch Video</h4>
+
+                <p>
+                  ${story.watch_video_path
+                    ? 'មានវីដេអូរួចហើយ'
+                    : 'មិនទាន់មានវីដេអូ'}
+                </p>
+
+                <input type="file"
+                  accept="video/mp4"
+                  id="video_watch_${adminEscape(story.id)}">
+
+                <button class="primary" type="button"
+                  onclick="adminUploadVideo('${adminEscape(story.id)}','watch')">
+                  ⬆️ Upload / Replace Watch
+                </button>
+
+                ${story.watch_video_path ? `
+                  <button class="primary" type="button"
+                    onclick="adminDeleteVideo('${adminEscape(story.id)}','watch')">
+                    🗑️ Delete Watch
+                  </button>
+                ` : ''}
+
+                <hr>
+
+                <h4>📥 Download Video</h4>
+
+                <p>
+                  ${story.download_video_path
+                    ? 'មានវីដេអូរួចហើយ'
+                    : 'មិនទាន់មានវីដេអូ'}
+                </p>
+
+                <input type="file"
+                  accept="video/mp4"
+                  id="video_download_${adminEscape(story.id)}">
+
+                <button class="primary" type="button"
+                  onclick="adminUploadVideo('${adminEscape(story.id)}','download')">
+                  ⬆️ Upload / Replace Download
+                </button>
+
+                ${story.download_video_path ? `
+                  <button class="primary" type="button"
+                    onclick="adminDeleteVideo('${adminEscape(story.id)}','download')">
+                    🗑️ Delete Download
+                  </button>
+                ` : ''}
+
+                <hr>
+
+                <button class="primary" type="button"
+                  onclick="adminEditStory('${adminEscape(story.id)}')">
+                  ✏️ កែប្រែរឿង
+                </button>
+
+                <button class="primary" type="button"
+                  onclick="adminArchiveStory('${adminEscape(story.id)}')">
+                  📦 Archive
+                </button>
+
+              </div>
+            ` : ''}
+
+          </div>
+        `).join('')}
       </div>
-    `).join('');
+    `;
 
   } catch (error) {
     list.textContent = error.message;
   }
 }
-
 // Edit story title and description
 async function adminEditStory(id) {
   const title = prompt('បញ្ចូលឈ្មោះរឿងថ្មី:');
