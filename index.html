@@ -834,11 +834,72 @@ async function adminLoadStories() {
       <div class="panel" style="margin-top:12px">
         <h3>${adminEscape(story.title)}</h3>
         <p>${adminEscape(story.description || '')}</p>
+
         <p>Watch: $${Number(story.watch_price_usd || 0).toFixed(2)}</p>
         <p>Download: $${Number(story.download_price_usd || 0).toFixed(2)}</p>
         <p>Watch: ៛${Number(story.watch_price_khr || 0).toLocaleString()}</p>
         <p>Download: ៛${Number(story.download_price_khr || 0).toLocaleString()}</p>
+
         <p>ស្ថានភាព: ${story.published ? 'Published' : 'មិនទាន់ Publish'}</p>
+
+        <hr>
+
+        <h4>🎬 Highlight Video</h4>
+        <p>${story.highlight_video_path ? 'មានវីដេអូរួចហើយ' : 'មិនទាន់មានវីដេអូ'}</p>
+        <input type="file" accept="video/mp4"
+          id="video_highlight_${adminEscape(story.id)}">
+
+        <button class="primary" type="button"
+          onclick="adminUploadVideo('${adminEscape(story.id)}','highlight')">
+          ⬆️ Upload / Replace Highlight
+        </button>
+
+        ${story.highlight_video_path ? `
+          <button class="primary" type="button"
+            onclick="adminDeleteVideo('${adminEscape(story.id)}','highlight')">
+            🗑️ Delete Highlight
+          </button>
+        ` : ''}
+
+        <hr>
+
+        <h4>📺 Watch Video</h4>
+        <p>${story.watch_video_path ? 'មានវីដេអូរួចហើយ' : 'មិនទាន់មានវីដេអូ'}</p>
+        <input type="file" accept="video/mp4"
+          id="video_watch_${adminEscape(story.id)}">
+
+        <button class="primary" type="button"
+          onclick="adminUploadVideo('${adminEscape(story.id)}','watch')">
+          ⬆️ Upload / Replace Watch
+        </button>
+
+        ${story.watch_video_path ? `
+          <button class="primary" type="button"
+            onclick="adminDeleteVideo('${adminEscape(story.id)}','watch')">
+            🗑️ Delete Watch
+          </button>
+        ` : ''}
+
+        <hr>
+
+        <h4>📥 Download Video</h4>
+        <p>${story.download_video_path ? 'មានវីដេអូរួចហើយ' : 'មិនទាន់មានវីដេអូ'}</p>
+        <input type="file" accept="video/mp4"
+          id="video_download_${adminEscape(story.id)}">
+
+        <button class="primary" type="button"
+          onclick="adminUploadVideo('${adminEscape(story.id)}','download')">
+          ⬆️ Upload / Replace Download
+        </button>
+
+        ${story.download_video_path ? `
+          <button class="primary" type="button"
+            onclick="adminDeleteVideo('${adminEscape(story.id)}','download')">
+            🗑️ Delete Download
+          </button>
+        ` : ''}
+
+        <hr>
 
         <button class="primary" type="button"
           onclick="adminEditStory('${adminEscape(story.id)}')">
