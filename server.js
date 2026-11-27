@@ -414,7 +414,85 @@ app.patch("/api/admin/stories/:id", requireAdmin, async (req, res) => {
 
   res.json({ status: "success", story: data });
 });
+// Admin delete story video
+app.delete("/api/admin/story-video", requireAdmin, async (req, res) => {
+  try {
+    const { story_id, video_type } = req.body || {};
 
+    const fields = {
+      highlight: "highlight_video_path",
+      watch: "watch_video_path",
+      download: "download_video_path"
+    };
+
+    const field = fields[video_type];
+
+    if (!story_id || !field) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid story or video type"
+      });
+    }
+
+    const { data: story, error: fetchError } = await supabase
+      .from("stories")
+      .select("id, highlight_video_path, watch_video_path, download_video_path")
+      .eq("id", story_id)
+      .maybeSingle();
+
+    if (fetchError || !story) {
+      return res.status(404).json({
+        status: "error",
+        message: "Story not found"
+      });
+    }
+
+    const filePath = story[field];
+
+    if (!filePath) {
+      return res.status(404).json({
+        status: "error",
+        message: "Video not found"
+      });
+    }
+
+    const { error: deleteError } = await supabase.storage
+      .from("story-videos")
+      .remove([filePath]);
+
+    if (deleteError) {
+      return res.status(500).json({
+        status: "error",
+        message: "Could not delete video"
+      });
+    }
+
+    const { error: updateError } = await supabase
+      .from("stories")
+      .update({ [field]: null })
+      .eq("id", story_id);
+
+    if (updateError) {
+      return res.status(500).json({
+        status: "error",
+        message: "Video deleted but story update failed"
+      });
+    }
+
+    return res.json({
+      status: "success",
+      message: "Video deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("DELETE VIDEO ERROR:", error);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Server delete error"
+    });
+  }
+});
 // Admin: Archive story instead of permanently deleting it
 app.delete("/api/admin/stories/:id", requireAdmin, async (req, res) => {
   const { data, error } = await supabase
