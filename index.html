@@ -1282,6 +1282,111 @@ function filterStoreStories() {
   }).join('');
 }
 
+function openPurchase(storyId, purchaseType) {
+  const story = storeStories.find(
+    item => String(item.id) === String(storyId)
+  );
+
+  if (!story) {
+    alert('រកមិនឃើញរឿងនេះទេ');
+    return;
+  }
+
+  const isWatch = purchaseType === 'watch';
+
+  const priceUSD = isWatch
+    ? Number(story.watch_price_usd || 0)
+    : Number(story.download_price_usd || 0);
+
+  const priceKHR = isWatch
+    ? Number(story.watch_price_khr || 0)
+    : Number(story.download_price_khr || 0);
+
+  const oldModal = document.getElementById('purchaseModal');
+
+  if (oldModal) oldModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'purchaseModal';
+
+  modal.style.cssText = `
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background:#121b2e;
+      color:white;
+      width:100%;
+      max-width:400px;
+      padding:22px;
+      border-radius:18px;
+      border:1px solid #29364e;
+    ">
+      <h2 style="margin-top:0">
+        ${isWatch ? '🎬 ទិញដើម្បីមើល' : '📥 ទិញដើម្បី Download'}
+      </h2>
+
+      <h3>${adminEscape(story.title)}</h3>
+
+      <p style="color:#ffc44d;font-weight:bold">
+        $${priceUSD.toFixed(2)}
+      </p>
+
+      <p>៛${priceKHR.toLocaleString('en-US')}</p>
+
+      <hr style="border-color:#29364e">
+
+      <p>សូមជ្រើសរើសវិធីបង់ប្រាក់</p>
+
+      <button
+        onclick="selectPurchaseMethod('wallet')"
+        style="width:100%;padding:12px;margin:6px 0"
+      >
+        💰 បង់តាម Wallet
+      </button>
+
+      <button
+        onclick="selectPurchaseMethod('qr')"
+        style="width:100%;padding:12px;margin:6px 0"
+      >
+        📱 បង់តាម Admin QR
+      </button>
+
+      <button
+        onclick="document.getElementById('purchaseModal').remove()"
+        style="width:100%;padding:12px;margin-top:12px;background:#29364e;color:white"
+      >
+        បិទ
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  window.selectedPurchase = {
+    story_id: storyId,
+    purchase_type: purchaseType,
+    amount_usd: priceUSD,
+    amount_khr: priceKHR
+  };
+}
+
+function selectPurchaseMethod(method) {
+  if (method === 'wallet') {
+    alert('យើងនឹងភ្ជាប់ Wallet នៅជំហានបន្ទាប់។');
+  } else if (method === 'qr') {
+    alert('យើងនឹងភ្ជាប់ Admin QR នៅជំហានបន្ទាប់។');
+  }
+}
+
 // Load stories when the website opens
 loadStoreStories();
 
