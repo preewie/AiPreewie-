@@ -1379,9 +1379,61 @@ function openPurchase(storyId, purchaseType) {
   };
 }
 
-function selectPurchaseMethod(method) {
+async function selectPurchaseMethod(method) {
+  if (!window.selectedPurchase) {
+    alert('មិនមានព័ត៌មានការទិញទេ');
+    return;
+  }
+
   if (method === 'wallet') {
-    alert('យើងនឹងភ្ជាប់ Wallet នៅជំហានបន្ទាប់។');
+    const { data } = await supabaseClient.auth.getSession();
+    const session = data.session;
+
+    if (!session) {
+      alert('សូម Login ជាមុនសិន');
+      showPage('profile');
+      return;
+    }
+
+    const purchase = window.selectedPurchase;
+
+    if (!confirm(
+      `តើអ្នកចង់ទិញរឿងនេះដោយ Wallet ក្នុងតម្លៃ $${purchase.amount_usd.toFixed(2)} មែនទេ?`
+    )) {
+      return;
+    }
+
+    try {
+      alert('កំពុងដំណើរការទិញ...');
+
+      const response = await fetch(
+        'https://aipreewie-backend.onrender.com/api/purchase/wallet',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            story_id: purchase.story_id,
+            purchase_type: purchase.purchase_type
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'ការទិញមិនបានជោគជ័យ');
+      }
+
+      document.getElementById('purchaseModal')?.remove();
+
+      alert('🎉 ទិញរឿងបានជោគជ័យ!');
+
+    } catch (error) {
+      alert(error.message);
+    }
   } else if (method === 'qr') {
     alert('យើងនឹងភ្ជាប់ Admin QR នៅជំហានបន្ទាប់។');
   }
