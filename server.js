@@ -521,7 +521,98 @@ app.delete("/api/admin/stories/:id", requireAdmin, async (req, res) => {
     message: "Story archived"
   });
 });
+// User: Buy story with wallet
+app.post("/api/purchase/wallet", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : null;
 
+    if (!token) {
+      return res.status(401).json({
+        status: "error",
+        message: "Please login first"
+      });
+    }
+
+    const { data: userData, error: userError } =
+      await supabase.auth.getUser(token);
+
+    if (userError || !userData.user) {
+      return res.status(401).json({
+        status: "error",
+        message: "Invalid login"
+      });
+    }
+
+    const { story_id, purchase_type } = req.body || {};
+
+    if (
+      !story_id ||
+      !["watch", "download"].includes(purchase_type)
+    ) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid purchase information"
+      });
+    }
+
+    const SUPABASE_ANON_KEY =
+      process.env.SUPABASE_ANON_KEY;
+
+    if (!SUPABASE_ANON_KEY) {
+      return res.status(500).json({
+        status: "error",
+        message: "Server configuration error"
+      });
+    }
+
+    const userSupabase = createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY,
+      {
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
+    const { data, error } = await userSupabase.rpc(
+      "buy_story_with_wallet",
+      {
+        p_story_id: story_id,
+        p_purchase_type: purchase_type
+      }
+    );
+
+    if (error) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message
+      });
+    }
+
+    return res.json({
+      status: "success",
+      purchase: data
+    });
+
+  } catch (error) {
+    console.error("WALLET PURCHASE ERROR:", error);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Wallet purchase failed"
+    });
+  }
+});
 app.listen(PORT, () => {
   console.log(`AiPreewie server running on port ${PORT}`);
 });
