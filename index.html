@@ -609,9 +609,48 @@ supabaseClient.auth.onAuthStateChange((_event, session) => {
 
 let balance=Number(localStorage.getItem('aipreewie_demo_usd')||0);
 
-function renderBalance(){
-  document.getElementById('usdBalance').textContent='$'+balance.toFixed(2)+' USD';
-  document.getElementById('khrBalance').textContent='៛'+Math.round(balance*RATE).toLocaleString('en-US')+' KHR';
+async function renderBalance() {
+  const usdEl = document.getElementById('usdBalance');
+  const khrEl = document.getElementById('khrBalance');
+
+  if (!usdEl || !khrEl) return;
+
+  try {
+    const { data } = await supabaseClient.auth.getSession();
+    const session = data.session;
+
+    if (!session) {
+      balance = 0;
+      usdEl.textContent = '$0.00 USD';
+      khrEl.textContent = '៛0 KHR';
+      return;
+    }
+
+    const response = await fetch(
+      'https://aipreewie-backend.onrender.com/api/wallet/balance',
+      {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Failed to load wallet');
+    }
+
+    balance = Number(result.balance_usd || 0);
+
+    usdEl.textContent = '$' + balance.toFixed(2) + ' USD';
+    khrEl.textContent = '៛' + Math.round(balance * RATE).toLocaleString('en-US') + ' KHR';
+
+  } catch (error) {
+    console.error('Wallet balance error:', error);
+    usdEl.textContent = 'Unable to load';
+    khrEl.textContent = 'Unable to load';
+  }
 }
 
 function addDemoCredit(){
