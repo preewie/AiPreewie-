@@ -613,6 +613,57 @@ app.post("/api/purchase/wallet", async (req, res) => {
     });
   }
 });
+app.get("/api/wallet/balance", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || "";
+    const token = authHeader.startsWith("Bearer ")
+      ? authHeader.slice(7)
+      : null;
+
+    if (!token) {
+      return res.status(401).json({
+        status: "error",
+        message: "Please login first"
+      });
+    }
+
+    const { data: userData, error: userError } =
+      await supabase.auth.getUser(token);
+
+    if (userError || !userData.user) {
+      return res.status(401).json({
+        status: "error",
+        message: "Invalid login"
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("wallets")
+      .select("balance_usd")
+      .eq("user_id", userData.user.id)
+      .maybeSingle();
+
+    if (error) {
+      return res.status(500).json({
+        status: "error",
+        message: error.message
+      });
+    }
+
+    return res.json({
+      status: "success",
+      balance_usd: data?.balance_usd ?? 0
+    });
+
+  } catch (error) {
+    console.error("WALLET BALANCE ERROR:", error);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Failed to load wallet"
+    });
+  }
+});
 app.listen(PORT, () => {
   console.log(`AiPreewie server running on port ${PORT}`);
 });
